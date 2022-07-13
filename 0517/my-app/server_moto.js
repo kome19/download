@@ -29,30 +29,12 @@ app.set('view engine', 'ejs')
 app.get('/', (req, res) => {
   if (req.session.user) {
     const user = req.session.user
-    client.send(new ListObjectsCommand({ Bucket: 'gazouserver01' }))
-            .then(data => {
-              const syousai = data.Contents.map(o => {return{ namae: o.Key, size: o.Size}})
-              res.render('index.ejs',{
-                id:syousai,
-                name: "hi! " + user.name
-              })
-            })
+    res.render('index.ejs',{name: "hi! " + user.name})
   } else {
     res.render('hoge.ejs',{name:" "});
   }
 })
-app.get("/download", (req,res)=>{
-  if(req.session.user){
-    var name1 = req.query.name
-    client.send(new GetObjectCommand({ Bucket: 'gazouserver01', Key: name1 }))
-    .then(data => {
-      res.attachment(name1)
-      data.Body.pipe(res)
-    })
-  }else{
-    res.render('hoge.ejs',{name:"Imログインnow"})
-  }
-})
+
 
 app.post("/top", (req,res)=>{
   id =req.body.mozi1;
@@ -76,21 +58,13 @@ app.post("/top", (req,res)=>{
     }
     var angou = crypto.createHash('sha256').update(pass).digest('hex')
     for (let i=0; i<results.length; ++i){
-      if(id==results[i].user_id){   
+      if(id==results[i].user_id){
         if(id==results[i].user_id && angou==results[i].password){
           req.session.user={
             user_id:results[i].user_id,
             name:results[i].name
-          }
-          client.send(new ListObjectsCommand({ Bucket: 'gazouserver01' }))
-            .then(data => {
-              const syousai = data.Contents.map(o => {return{ namae: o.Key, size: o.Size}})
-              res.render('index.ejs',{
-                name:"hi! "+ results[i].name,
-                id:syousai
-              })
-            })
-            
+          } 
+            res.render('index.ejs',{name:"hi! "+ results[i].name})
        }else{
         res.render('hoge.ejs',{name: "違います"});
        }
