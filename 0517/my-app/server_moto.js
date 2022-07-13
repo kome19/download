@@ -12,30 +12,6 @@ const { render } = require('ejs');
 const DynamoDBStore = require('connect-dynamodb')({session: session})
 const client = new S3()
 
-
-app.use('/', session({
-  name: 'login.session',
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { path: '/', secure: false },
-  store: new DynamoDBStore({
-    table: 'session-table'
-  })
-}))
-
-
-app.set('view engine', 'ejs')
-app.get('/', (req, res) => {
-  if (req.session.user) {
-    const user = req.session.user
-    res.render('index.ejs',{name: "hi! " + user.name})
-  } else {
-    res.render('hoge.ejs',{name:" "});
-  }
-})
-
-
 app.post("/top", (req,res)=>{
   id =req.body.mozi1;
   pass =  req.body.mozi2;
@@ -60,11 +36,7 @@ app.post("/top", (req,res)=>{
     for (let i=0; i<results.length; ++i){
       if(id==results[i].user_id){
         if(id==results[i].user_id && angou==results[i].password){
-          req.session.user={
-            user_id:results[i].user_id,
-            name:results[i].name
-          } 
-            res.render('index.ejs',{name:"hi! "+ results[i].name})
+          res.render('index.ejs',{name:"hi! "+ results[i].name})
        }else{
         res.render('hoge.ejs',{name: "違います"});
        }
